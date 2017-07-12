@@ -1,8 +1,8 @@
 let isFunction = function (obj) {
-    return typeof obj == 'function' || false;
+    return typeof obj === 'function' || false;
 };
 
-class EventEmitter
+export default class EventEmitter
 {
     constructor() {
         this.listeners = new Map();

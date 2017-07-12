@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PositionWatcher from '../../utils/PositionWatcher';
  
-import Header from '../header/Header';
-import RaidMap from '../google-maps/RaidMap';
+import Header from '../ui/Header';
+import RaidMap from '../raid/RaidMap';
 import './Home.css';
 
 export default class Home extends Component
@@ -29,18 +29,19 @@ export default class Home extends Component
 
     componentDidMount = () =>
     {
-        let positionWatcher = new PositionWatcher();
-        positionWatcher.addListener(PositionWatcher.POSITION_UPDATE, this.positionUpdate);
-        positionWatcher.addListener(PositionWatcher.POSITION_NOT_FOUND, this.positionNotFound);
+        this.positionWatcher = new PositionWatcher();
+        this.positionWatcher.addListener(PositionWatcher.POSITION_UPDATE, this.positionUpdate);
+        this.positionWatcher.addListener(PositionWatcher.POSITION_NOT_FOUND, this.positionNotFound);
     }
 
     componentWillUnmount = () =>
     {
+        this.positionWatcher.stopWatching();
     }
 
     render() {
         return (
-            <div className="App">
+            <div className="home">
                 <Header
                     title="PoGo Raid Organizer"
                     search_placeholder="Livello o pok&eacute;mon"

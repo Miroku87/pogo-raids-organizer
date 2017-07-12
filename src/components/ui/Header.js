@@ -12,7 +12,7 @@ export default class Header extends Component
             <Navbar>
                 <Navbar.Header>
                     <Navbar.Brand>
-                        <a href="#"><img src={logo} /></a>
+                        <a href="#" alt="logo"><img src={logo} alt="logo" /></a>
                     </Navbar.Brand>
                     <Navbar.Brand>
                         <a href="#">{this.props.title}</a>
@@ -21,7 +21,7 @@ export default class Header extends Component
                 </Navbar.Header>
                 <Navbar.Form pullRight>
                     <FormGroup>
-                        <FormControl type="text" placeholder="{this.props.search_placeholder}" />
+                        <FormControl type="text" placeholder={this.props.search_placeholder} />
                     </FormGroup>
                     {' '}
                     <Button type="submit">{this.props.search_action}</Button>
