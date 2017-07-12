@@ -1,5 +1,6 @@
 import { default as React, Component } from "react";
 import { Navbar, FormGroup, Button, FormControl } from "react-bootstrap";
+import { Link } from 'react-router-dom'
 
 import logo from "../../assets/logo.png";
 import "./Header.css";
@@ -12,10 +13,10 @@ export default class Header extends Component
             <Navbar>
                 <Navbar.Header>
                     <Navbar.Brand>
-                        <a href="#" alt="logo"><img src={logo} alt="logo" /></a>
+                        <Link to="/"><img src={logo} alt="logo" /></Link>
                     </Navbar.Brand>
                     <Navbar.Brand>
-                        <a href="#">{this.props.title}</a>
+                        <Link to="/">{this.props.title}</Link>
                     </Navbar.Brand>
                     <Navbar.Toggle />
                 </Navbar.Header>

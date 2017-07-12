@@ -19,7 +19,7 @@ import "./RaidMap.css";
 const Map = withGoogleMap(props => (
     <GoogleMap
         ref={props.onMapLoad}
-        defaultZoom={13}
+        defaultZoom={16}
         defaultCenter={{ lat: 45.464218, lng: 9.1881625 }}
         center={props.center}
         onClick={props.onMapClick}
@@ -31,7 +31,8 @@ const Map = withGoogleMap(props => (
                 options={{ maxWidth: 170 }}
             >
                 <div className="info-content">
-                    <ButtonGoToHistory goto={props.newRaidGoTo}></ButtonGoToHistory>
+                    <ButtonGoToHistory goto={props.newRaidGoTo}>Nuovo Raid Qui</ButtonGoToHistory><br /><br />
+                    Oppure clicca un altro punto
                 </div>
             </InfoWindow>
         )}
@@ -58,9 +59,21 @@ export default class RaidMap extends Component
         };
     }
 
-    handleMapLoad = (map) =>
+    showInfoPopup = ( coordinates ) =>
     {
-        this._mapComponent = map;
+        this.setState({
+            info_position: coordinates,
+            new_raid_goto: '/raid_insert/' + coordinates.lat + "/" + coordinates.lng
+        });
+    }
+
+    setMapCenter = (coordinates) =>
+    {
+        this.setState({
+            center: {
+                lat: coordinates.lat, lng: coordinates.lng
+            }
+        });
     }
 
     /*
@@ -81,12 +94,7 @@ export default class RaidMap extends Component
          markers: nextMarkers
          });*/
 
-        let position = event.latLng;
-
-        this.setState({
-            info_position: event.latLng,
-            new_raid_goto: '/raid_insert/' + position.lat() + "/" + position.lng()
-        });
+        this.showInfoPopup({ lat: event.latLng.lat(), lng: event.latLng.lng() } );
     }
 
     handleMarkerRightClick = ( targetMarker ) =>

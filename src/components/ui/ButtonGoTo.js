@@ -14,9 +14,7 @@ export default class ButtonGoTo extends Component {
             <Button
                 {...rest}
                 onClick={this.clickHandler}
-            >
-                Nuovo Raid Qui
-            </Button>
+            />
         );
     }
 }
