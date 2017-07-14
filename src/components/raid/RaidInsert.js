@@ -4,9 +4,6 @@ import { FormGroup, Button, FormControl } from "react-bootstrap";
 
 export default class RaidInsert extends Component
 {
-    componentDidMount = () => {
-
-    }
 
     render() {
         return (

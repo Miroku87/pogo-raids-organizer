@@ -17,15 +17,16 @@ export default class App extends Component
         console.log( err );
     }
 
-    positionUpdate = ( position ) =>
+   positionUpdate = ( position ) =>
     {
         let position_obj = {
             lat: position.coords.latitude, lng: position.coords.longitude
         };
 
-        this.map.setMapCenter( position_obj );
+        if ( this.map )
+            this.map.setMapCenter( position_obj );
 
-        if ( this.first_position_update !== false )
+        if ( this.map && this.first_position_update !== false )
         {
             this.first_position_update = false;
             this.map.showInfoPopup( position_obj );
@@ -47,14 +48,14 @@ export default class App extends Component
     render()
     {
         return (
-            <Router>
+            <Router forceRefresh={true}>
                 <div className="app">
                     <Header
                         title="PoGo Raid Organizer"
                         search_placeholder="Livello o pok&eacute;mon"
                         search_action="Filtra"
                     />
-                    <Route exact path="/" render={props => (
+                    <Route exact path="/" ref={( rm ) => { this.rm = rm; }} render={props => (
                         <RaidMap ref={( map ) => { this.map = map; }} {...props} />
                     )} />
                     <Route path="/raid_insert/:lat/:lng" component={RaidInsert} />

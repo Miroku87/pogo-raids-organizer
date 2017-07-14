@@ -3,13 +3,7 @@ import { withGoogleMap, GoogleMap, Marker, InfoWindow } from "react-google-maps"
 import { ButtonGoToHistory } from "../ui/ButtonGoTo";
 import "./RaidMap.css";
 
-/*const NewRaidButton = withRouter(({ history, onClick, position }) => (
-    <Button
-        onClick={() => { onClick(history, position) }}
-    >
-        Nuovo Raid Qui
-    </Button>
-));*/
+const MILAN_COORDINATES = { lat: 45.464218, lng: 9.1881625 };
 /*
  * This is the modify version of:
  * https://developers.google.com/maps/documentation/javascript/examples/event-arguments
@@ -19,10 +13,11 @@ import "./RaidMap.css";
 const Map = withGoogleMap(props => (
     <GoogleMap
         ref={props.onMapLoad}
-        defaultZoom={16}
-        defaultCenter={{ lat: 45.464218, lng: 9.1881625 }}
+        defaultZoom={props.mapZoom}
+        defaultCenter={MILAN_COORDINATES}
         center={props.center}
         onClick={props.onMapClick}
+        defaultOptions={{ clickableIcons: false }}
     >
         {props.infoPosition && (
             <InfoWindow
@@ -49,31 +44,47 @@ export default class RaidMap extends Component
 {
     constructor( props )
     {
-        super(props);
+        super( props );
 
         this.state = {
-            markers       : [],
-            center        : null,
-            info_position : null,
-            new_raid_goto : null
+            markers: [],
+            center: null,
+            info_position: null,
+            new_raid_goto: null,
+            zoom: 16
         };
     }
 
     showInfoPopup = ( coordinates ) =>
     {
-        this.setState({
+        this.setState( {
             info_position: coordinates,
             new_raid_goto: '/raid_insert/' + coordinates.lat + "/" + coordinates.lng
-        });
+        } );
     }
 
-    setMapCenter = (coordinates) =>
+    setMapCenter = ( coordinates ) =>
     {
-        this.setState({
+        this.setState( {
             center: {
                 lat: coordinates.lat, lng: coordinates.lng
             }
-        });
+        } );
+    }
+
+    redrawMap = () =>
+    {
+        if ( this._mapComponent && window.hasOwnProperty("google") )
+        {
+            console.log( window.google.maps.event );
+            window.google.maps.event.trigger( 'resize' );
+            window.google.maps.event.trigger( this._mapComponent.context['__SECRET_MAP_DO_NOT_USE_OR_YOU_WILL_BE_FIRED'], 'resize' );
+        }
+    }
+
+    handleMapLoad = ( map ) =>
+    {
+        this._mapComponent = map;
     }
 
     /*
@@ -117,26 +128,36 @@ export default class RaidMap extends Component
         });
     }
 
+    componentDidMount()
+    {
+        this.redrawMap();
+    }
+
+    componentDidUpdate = () =>
+    {
+        this.redrawMap();
+    }
+
     render()
     {
         return (
             <div className="raid-map">
                 <Map
                     containerElement={
-                        <div style={{ height: `100%` }} />
+                        <div style={{ height: "100%" }} />
                         }
                     mapElement={
-                        <div style={{ height: `100%` }} />
+                        <div style={{ height: "100%" }} />
                         }
                     center={this.state.center}
                     markers={this.state.markers}
                     infoPosition={this.state.info_position}
                     newRaidGoTo={this.state.new_raid_goto}
+                    mapZoom={this.state.zoom}
                     infoCloseHandler={this.handleInfoClose}
                     onMapLoad={this.handleMapLoad}
                     onMapClick={this.handleMapClick}
                     onMarkerRightClick={this.handleMarkerRightClick}
-                    onNewRaidClick={this.handleNewRaidClick}
                 />
             </div>
         );
