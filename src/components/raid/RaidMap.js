@@ -48,7 +48,6 @@ export default class RaidMap extends Component
 
         this.state = {
             markers: [],
-            center: null,
             info_position: null,
             new_raid_goto: null,
             zoom: 16
@@ -61,25 +60,6 @@ export default class RaidMap extends Component
             info_position: coordinates,
             new_raid_goto: '/raid_insert/' + coordinates.lat + "/" + coordinates.lng
         } );
-    }
-
-    setMapCenter = ( coordinates ) =>
-    {
-        this.setState( {
-            center: {
-                lat: coordinates.lat, lng: coordinates.lng
-            }
-        } );
-    }
-
-    redrawMap = () =>
-    {
-        if ( this._mapComponent && window.hasOwnProperty("google") )
-        {
-            console.log( window.google.maps.event );
-            window.google.maps.event.trigger( 'resize' );
-            window.google.maps.event.trigger( this._mapComponent.context['__SECRET_MAP_DO_NOT_USE_OR_YOU_WILL_BE_FIRED'], 'resize' );
-        }
     }
 
     handleMapLoad = ( map ) =>
@@ -130,12 +110,14 @@ export default class RaidMap extends Component
 
     componentDidMount()
     {
-        this.redrawMap();
+        if(this.props.mapCenter)
+            this.showInfoPopup( this.props.mapCenter );
     }
 
-    componentDidUpdate = () =>
+    componentWillReceiveProps(nextProps)
     {
-        this.redrawMap();
+        console.log(nextProps.mapCenter);
+        this.showInfoPopup( nextProps.mapCenter );
     }
 
     render()
@@ -149,7 +131,7 @@ export default class RaidMap extends Component
                     mapElement={
                         <div style={{ height: "100%" }} />
                         }
-                    center={this.state.center}
+                    center={this.props.mapCenter}
                     markers={this.state.markers}
                     infoPosition={this.state.info_position}
                     newRaidGoTo={this.state.new_raid_goto}

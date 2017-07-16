@@ -12,19 +12,29 @@ import './App.css';
 
 export default class App extends Component
 {
+    constructor(props)
+    {
+        super(props);
+        this.state = {
+            map_center: null
+        }
+    }
+
     positionNotFound = ( err ) => 
     {
         console.log( err );
     }
 
-   positionUpdate = ( position ) =>
+    positionUpdate = ( position ) =>
     {
         let position_obj = {
             lat: position.coords.latitude, lng: position.coords.longitude
         };
 
-        if ( this.map )
-            this.map.setMapCenter( position_obj );
+        console.log("positionUpdate");
+        this.setState({
+            map_center: position_obj
+        });
 
         if ( this.map && this.first_position_update !== false )
         {
@@ -38,25 +48,33 @@ export default class App extends Component
         this.positionWatcher = new PositionWatcher();
         this.positionWatcher.addListener( PositionWatcher.POSITION_UPDATE, this.positionUpdate );
         this.positionWatcher.addListener( PositionWatcher.POSITION_NOT_FOUND, this.positionNotFound );
+
+        console.log(this.state.map_center);
+
+        if(this.state.map_center)
+            this.map.showInfoPopup( this.state.map_center );
     }
 
     componentWillUnmount = () =>
     {
         this.positionWatcher.stopWatching();
-    }
+    };
 
     render()
     {
         return (
-            <Router forceRefresh={true}>
+            <Router>
                 <div className="app">
                     <Header
                         title="PoGo Raid Organizer"
                         search_placeholder="Livello o pok&eacute;mon"
                         search_action="Filtra"
                     />
-                    <Route exact path="/" ref={( rm ) => { this.rm = rm; }} render={props => (
-                        <RaidMap ref={( map ) => { this.map = map; }} {...props} />
+                    <Route exact path="/" render={props => (
+                        <RaidMap
+                            ref={( map ) => { this.map = map; }}
+                            mapCenter={this.state.map_center}
+                            {...props} />
                     )} />
                     <Route path="/raid_insert/:lat/:lng" component={RaidInsert} />
                     <Route path="/raid_chat/:id" component={RaidChat} />
