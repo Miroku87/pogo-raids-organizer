@@ -116,7 +116,6 @@ export default class RaidMap extends Component
 
     componentWillReceiveProps(nextProps)
     {
-        console.log(nextProps.mapCenter);
         this.showInfoPopup( nextProps.mapCenter );
     }
 
@@ -133,7 +132,7 @@ export default class RaidMap extends Component
                         }
                     center={this.props.mapCenter}
                     markers={this.state.markers}
-                    infoPosition={this.state.info_position}
+                    infoPosition={this.state.info_position || this.props.infoPopupPosition}
                     newRaidGoTo={this.state.new_raid_goto}
                     mapZoom={this.state.zoom}
                     infoCloseHandler={this.handleInfoClose}

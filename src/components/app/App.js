@@ -6,6 +6,7 @@ import Header from '../ui/Header';
 import RaidInsert from '../raid/RaidInsert';
 import RaidChat from '../raid/RaidChat';
 import RaidInfo from '../raid/RaidInfo';
+import Help from './Help';
 import PositionWatcher from '../../utils/PositionWatcher';
 
 import './App.css'; 
@@ -16,7 +17,8 @@ export default class App extends Component
     {
         super(props);
         this.state = {
-            map_center: null
+            map_center: null,
+            info_popup_position: null
         }
     }
 
@@ -31,15 +33,16 @@ export default class App extends Component
             lat: position.coords.latitude, lng: position.coords.longitude
         };
 
-        console.log("positionUpdate");
         this.setState({
             map_center: position_obj
         });
 
-        if ( this.map && this.first_position_update !== false )
+        if ( this.first_position_update !== false )
         {
             this.first_position_update = false;
-            this.map.showInfoPopup( position_obj );
+            this.setState( {
+                info_popup_position: position_obj
+            } );
         }
     }
 
@@ -48,11 +51,11 @@ export default class App extends Component
         this.positionWatcher = new PositionWatcher();
         this.positionWatcher.addListener( PositionWatcher.POSITION_UPDATE, this.positionUpdate );
         this.positionWatcher.addListener( PositionWatcher.POSITION_NOT_FOUND, this.positionNotFound );
-
-        console.log(this.state.map_center);
-
-        if(this.state.map_center)
-            this.map.showInfoPopup( this.state.map_center );
+        
+        if ( this.state.map_center )
+            this.setState( {
+                info_popup_position: this.state.map_center
+            } );
     }
 
     componentWillUnmount = () =>
@@ -74,11 +77,13 @@ export default class App extends Component
                         <RaidMap
                             ref={( map ) => { this.map = map; }}
                             mapCenter={this.state.map_center}
+                            infoPopupPosition={this.state.info_popup_position}
                             {...props} />
                     )} />
                     <Route path="/raid_insert/:lat/:lng" component={RaidInsert} />
                     <Route path="/raid_chat/:id" component={RaidChat} />
                     <Route path="/raid_info/:id" component={RaidInfo} />
+                    <Route path="/help" component={Help} />
                 </div>
             </Router>
         );
