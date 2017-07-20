@@ -36,14 +36,6 @@ export default class App extends Component
         this.setState({
             map_center: position_obj
         });
-
-        if ( this.first_position_update !== false )
-        {
-            this.first_position_update = false;
-            this.setState( {
-                info_popup_position: position_obj
-            } );
-        }
     }
 
     componentDidMount = () =>
@@ -77,7 +69,6 @@ export default class App extends Component
                         <RaidMap
                             ref={( map ) => { this.map = map; }}
                             mapCenter={this.state.map_center}
-                            infoPopupPosition={this.state.info_popup_position}
                             {...props} />
                     )} />
                     <Route path="/raid_insert/:lat/:lng" component={RaidInsert} />
