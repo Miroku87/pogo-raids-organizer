@@ -2,3 +2,9 @@
     height: calc( 100% - 52px );
 }
 
+.raid-info-win {
+    text-align: center;
+    min-width: 100px;
+    min-height: 100px;
+}
+

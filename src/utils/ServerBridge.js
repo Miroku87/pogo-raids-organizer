@@ -1,14 +1,16 @@
-import EventEmitter from "./EventEmitter";
 import 'whatwg-fetch';
 
 const
     RAID_SERVER_URL = 'http://localhost:9000/';
 
-export default class ServerBridge extends EventEmitter
+export default class ServerBridge
 {
-    constructor( options )
+    static callback = ( json, success, error ) =>
     {
-        super();
+        if ( json.status === "ok" && typeof success === "function" )
+            success( json );
+        else if ( json.status === "error" && typeof error === "function" )
+            error( json.message );
     }
 
     static getRaids = ( coords_info, success, error ) =>
@@ -22,12 +24,69 @@ export default class ServerBridge extends EventEmitter
             {
                 return response.json();
             } )
-            .then(( json ) => 
+            .then( ( json ) =>
             {
-                if ( json.status === "ok" )
-                    success( json.raids );
-                else if ( json.status === "error" )
-                    error( json.message );
+                ServerBridge.callback( json, success, error )
+            });
+    }
+
+    static getRaidInfo = ( raid_id, success, error ) =>
+    {
+        fetch( RAID_SERVER_URL + "?action=get&what=raidinfo&raid_id=" + raid_id, {
+            method: "GET"
+        } )
+            .then( function ( response )
+            {
+                return response.json();
+            } )
+            .then(( json ) =>
+            {
+                ServerBridge.callback( json, success, error )
+            } );
+    }
+
+    static setPartecipation = ( raid_id, user_id, success, error ) =>
+    {
+        fetch( RAID_SERVER_URL + "?action=insert&what=raidpartecipation&raid_id=" + raid_id + "&user_id=" + user_id, {
+            method: "GET"
+        } )
+            .then( function ( response )
+            {
+                return response.json();
+            } )
+            .then(( json ) =>
+            {
+                ServerBridge.callback( json, success, error )
+            } );
+    }
+
+    static removePartecipation = ( raid_id, user_id, success, error ) =>
+    {
+        fetch( RAID_SERVER_URL + "?action=remove&what=raidpartecipation&raid_id=" + raid_id + "&user_id=" + user_id, {
+            method: "GET"
+        } )
+            .then( function ( response )
+            {
+                return response.json();
+            } )
+            .then(( json ) =>
+            {
+                ServerBridge.callback( json, success, error )
+            } );
+    }
+
+    static getUserPartecipates = ( user_id, raid_id, success, error ) =>
+    {
+        fetch( RAID_SERVER_URL + "?action=get&what=userpartecipates&raid_id=" + raid_id + "&user_id=" + user_id, {
+            method: "GET"
+        } )
+            .then( function ( response )
+            {
+                return response.json();
+            } )
+            .then(( json ) =>
+            {
+                ServerBridge.callback( json, success, error )
             } );
     }
 
@@ -49,12 +108,9 @@ export default class ServerBridge extends EventEmitter
             {
                 return response.json();
             } )
-            .then(( json ) => 
+            .then( ( json ) =>
             {
-                if ( json.status === "ok" )
-                    success( json.raids );
-                else if ( json.status === "error" )
-                    error( json.message );
-            } );
+                ServerBridge.callback( json, success, error )
+            });
     }
 }

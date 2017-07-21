@@ -9,13 +9,13 @@ import RaidInfo from '../raid/RaidInfo';
 import Help from './Help';
 import PositionWatcher from '../../utils/PositionWatcher';
 
-import './App.css'; 
+import './App.css';
 
 export default class App extends Component
 {
-    constructor(props)
+    constructor( props )
     {
-        super(props);
+        super( props );
         this.state = {
             map_center: null,
             info_popup_position: null
@@ -33,21 +33,50 @@ export default class App extends Component
             lat: position.coords.latitude, lng: position.coords.longitude
         };
 
-        this.setState({
+        this.setState( {
             map_center: position_obj
-        });
+        } );
     }
 
-    componentDidMount = () =>
+    setupFacebookSDK = () =>
+    {
+        window.fbAsyncInit = function ()
+        {
+            window.FB.init( {
+                appId: '324218624671234',
+                cookie: true,
+                xfbml: true,
+                version: 'v2.8'
+            } );
+            window.FB.AppEvents.logPageView();
+        };
+
+        ( function ( d, s, id )
+        {
+            var js, fjs = d.getElementsByTagName( s )[0];
+            if ( d.getElementById( id ) ) { return; }
+            js = d.createElement( s ); js.id = id;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore( js, fjs );
+        }( document, 'script', 'facebook-jssdk' ) );
+    }
+
+    setupPositionWatcher = () =>
     {
         this.positionWatcher = new PositionWatcher();
         this.positionWatcher.addListener( PositionWatcher.POSITION_UPDATE, this.positionUpdate );
         this.positionWatcher.addListener( PositionWatcher.POSITION_NOT_FOUND, this.positionNotFound );
-        
+
         if ( this.state.map_center )
             this.setState( {
                 info_popup_position: this.state.map_center
             } );
+    }
+
+    componentDidMount = () =>
+    {
+        this.setupPositionWatcher();
+        this.setupFacebookSDK();
     }
 
     componentWillUnmount = () =>

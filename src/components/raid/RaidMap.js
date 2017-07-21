@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { withGoogleMap, GoogleMap, Marker, InfoWindow } from "react-google-maps";
+import { Glyphicon } from 'react-bootstrap';
 import { ButtonGoToHistory } from "../ui/ButtonGoTo";
 import Countdown from "../ui/Countdown";
 import ServerBridge from "../../utils/ServerBridge";
@@ -47,7 +48,8 @@ const Map = withGoogleMap( props => (
             const
                 onClick = () => props.onMarkerClick( marker ),
                 onCloseClick = () => props.onMarkerInfoCloseClick( marker ),
-                count_to = marker.start_time_elapsed ? marker.end_time : marker.start_time;
+                count_to = marker.start_time_elapsed ? marker.end_time : marker.start_time,
+                raid_url = "/raid_info/" + marker.key;
 
             return (
                 <Marker
@@ -58,9 +60,16 @@ const Map = withGoogleMap( props => (
                 >
                     {marker.showInfo && (
                         <InfoWindow onCloseClick={onCloseClick}>
-                            <div>
-                                <h4>Raid Lvl {marker.level}</h4> 
-                                <Countdown countTo={new Date( count_to )} />
+                            <div className="raid-info-win">
+                                <h4>{( new Array( parseInt( marker.level ) + 1 ).fill( 1 ) ).map(( e, i ) => { return ( <Glyphicon key={i} glyph="star" /> ); } )}</h4> 
+                                ~ <Countdown countTo={new Date( count_to )} /><br /><br />
+                                <ButtonGoToHistory
+                                    bsStyle="primary"
+                                    bsSize="xsmall"
+                                    goto={raid_url}
+                                >
+                                    Dettagli
+                                </ButtonGoToHistory>
                             </div>
                         </InfoWindow>
                     )}
@@ -98,11 +107,11 @@ export default class RaidMap extends Component
         this.showInfoPopup( nextProps.mapCenter );
     }
 
-    setMarkers = ( raids ) => 
+    setMarkers = ( data ) => 
     {
         let new_markers = [];
 
-        raids.forEach( ( r ) =>
+        data.raids.forEach( ( r ) =>
         {
             new_markers.push( {
                 key: r.raid_id,
@@ -127,18 +136,13 @@ export default class RaidMap extends Component
 
     getBounds = ( map ) =>
     {
-        if ( !map )
-            return false;
+        if ( !map || !map.getBounds() )
+            return null;
 
-        let temp_lat1 = map.getBounds().getNorthEast().lat(),
-            temp_lon1 = map.getBounds().getNorthEast().lng(),
-            temp_lat2 = map.getBounds().getSouthWest().lat(),
-            temp_lon2 = map.getBounds().getSouthWest().lng(),
-
-            lat1 = Math.min( temp_lat1, temp_lat2 ),
-            lon1 = Math.min( temp_lon1, temp_lon2 ),
-            lat2 = Math.max( temp_lat1, temp_lat2 ),
-            lon2 = Math.max( temp_lon1, temp_lon2 ); 
+        let lat2 = map.getBounds().getNorthEast().lat(),
+            lon2 = map.getBounds().getNorthEast().lng(),
+            lat1 = map.getBounds().getSouthWest().lat(),
+            lon1 = map.getBounds().getSouthWest().lng();
 
         return [ lat1, lon1, lat2, lon2 ];
     }
@@ -153,7 +157,9 @@ export default class RaidMap extends Component
         window.google.maps.event.addListener( this._mapComponent.context["__SECRET_MAP_DO_NOT_USE_OR_YOU_WILL_BE_FIRED"], 'idle', ( event ) =>
         {
             let bounds = this.getBounds( this._mapComponent );
-            ServerBridge.getRaids( bounds, this.setMarkers );
+
+            if( bounds )
+                ServerBridge.getRaids( bounds, this.setMarkers );
         } );
     }
 

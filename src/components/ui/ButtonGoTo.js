@@ -2,12 +2,15 @@ import React, { Component } from "react";
 import { withRouter } from 'react-router-dom';
 import { Button } from "react-bootstrap";
 
-export default class ButtonGoTo extends Component {
-    clickHandler = (event) => {
-        this.props.history.push(this.props.goto);
+export default class ButtonGoTo extends Component 
+{
+    clickHandler = ( event ) =>
+    {
+        this.props.history.push( this.props.goto );
     }
 
-    render() {
+    render()
+    {
         let { goto, match, location, history, staticContext, onClick, ...rest } = this.props;
 
         return (
@@ -19,4 +22,4 @@ export default class ButtonGoTo extends Component {
     }
 }
 
-export const ButtonGoToHistory = withRouter(ButtonGoTo);
+export const ButtonGoToHistory = withRouter( ButtonGoTo );
