@@ -1,0 +1,12 @@
+.raid-info .control-label {
+    text-align: right;
+}
+
+.button-group {
+    text-align: center;
+}
+
+    .button-group button {
+        min-width: 140px;
+        margin-top: 20px;
+    }

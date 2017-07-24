@@ -1,7 +1,8 @@
 import 'whatwg-fetch';
 
 const
-    RAID_SERVER_URL = 'http://localhost:9000/';
+    RAID_SERVER_URL = 'http://localhost:9000/',
+    CREDENTIALS = 'include';
 
 export default class ServerBridge
 {
@@ -18,7 +19,8 @@ export default class ServerBridge
         let coords = coords_info.join( "," );
 
         fetch( RAID_SERVER_URL + "?action=get&what=nearestraids&coords=" + coords, {
-            method: "GET"
+            method: "GET",
+            credentials: CREDENTIALS
         } )
             .then( function ( response )
             {
@@ -33,7 +35,8 @@ export default class ServerBridge
     static getRaidInfo = ( raid_id, success, error ) =>
     {
         fetch( RAID_SERVER_URL + "?action=get&what=raidinfo&raid_id=" + raid_id, {
-            method: "GET"
+            method: "GET",
+            credentials: CREDENTIALS
         } )
             .then( function ( response )
             {
@@ -45,10 +48,19 @@ export default class ServerBridge
             } );
     }
 
-    static setPartecipation = ( raid_id, user_id, success, error ) =>
+    static clearShowedRaidsSession = () =>
+    {
+        fetch( RAID_SERVER_URL + "?action=do&what=clearraidssession", {
+            method: "GET",
+            credentials: CREDENTIALS
+        } );
+    }
+
+    static sendPartecipation = ( raid_id, user_id, success, error ) =>
     {
         fetch( RAID_SERVER_URL + "?action=insert&what=raidpartecipation&raid_id=" + raid_id + "&user_id=" + user_id, {
-            method: "GET"
+            method: "GET",
+            credentials: CREDENTIALS
         } )
             .then( function ( response )
             {
@@ -63,7 +75,8 @@ export default class ServerBridge
     static removePartecipation = ( raid_id, user_id, success, error ) =>
     {
         fetch( RAID_SERVER_URL + "?action=remove&what=raidpartecipation&raid_id=" + raid_id + "&user_id=" + user_id, {
-            method: "GET"
+            method: "GET",
+            credentials: CREDENTIALS
         } )
             .then( function ( response )
             {
@@ -75,10 +88,11 @@ export default class ServerBridge
             } );
     }
 
-    static getUserPartecipates = ( user_id, raid_id, success, error ) =>
+    static getUserPartecipations = ( user_id, success, error ) =>
     {
-        fetch( RAID_SERVER_URL + "?action=get&what=userpartecipates&raid_id=" + raid_id + "&user_id=" + user_id, {
-            method: "GET"
+        fetch( RAID_SERVER_URL + "?action=get&what=userpartecipations&user_id=" + user_id, {
+            method: "GET",
+            credentials: CREDENTIALS
         } )
             .then( function ( response )
             {
@@ -98,6 +112,7 @@ export default class ServerBridge
         
         fetch( RAID_SERVER_URL, {
             method: "POST",
+            credentials: CREDENTIALS,
             headers: {
                 'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
                 'Content-Type': 'application/x-www-form-urlencoded'

@@ -1,0 +1,45 @@
+
+.modal-heading-primary {
+    color: #fff;
+    border-color: #337ab7;
+    background-color: #337ab7;
+    border-color: #337ab7;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+}
+
+.modal-heading-success {
+    border-color: #d6e9c6;
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+}
+
+.modal-heading-info {
+    border-color: #bce8f1;
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+}
+
+.modal-heading-warning {
+    border-color: #faebcc;
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+}
+
+.modal-heading-danger {
+    border-color: #ebccd1;
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+}

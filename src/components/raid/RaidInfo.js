@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { Panel, Grid, Row, Col, Button, ControlLabel } from "react-bootstrap";
-import Alert from '../ui/Alert';
+import PopUp from '../ui/PopUp';
 import Countdown from "../ui/Countdown";
 import { ButtonGoToHistory } from "../ui/ButtonGoTo";
 import ServerBridge from '../../utils/ServerBridge';
+import UserManager from '../../utils/UserManager';
 
 import "./RaidInfo.css";
 
@@ -25,7 +26,8 @@ export default class RaidInfo extends Component
             user_partecipates: false,
             raid_end_time: "",
             raid_start_time_elapsed: false,
-            rai_pokemon: ""
+            rai_pokemon: "",
+            partecipate_btn_enabled: false
         }
     }
 
@@ -44,73 +46,62 @@ export default class RaidInfo extends Component
         } );
     }
 
-    checkFacebookLogin = ( callback, event ) =>
+    managePartecipateButton = ( ) =>
     {
-        console.log( 0 );
-        window.FB.getLoginStatus(( response ) =>
-        {
-            console.log( "checkFacebookLogin", response );
-            if ( response.authResponse )
-                callback( response.authResponse );
-            else if ( !response.authResponse && event )
-                window.FB.login(() => { this.checkFacebookLogin( callback ) }, { scope: 'public_profile,email,user_friends' } );
-            else if ( !response.authResponse && !event )
-                callback( null );
-        } )
+        if ( UserManager.userData.is_connected )
+            this.setState( {
+                user_partecipates: UserManager.userPartecipatesTo( this.props.match.params.id ),
+                partecipate_btn_enabled: true
+            } );
     }
 
-    managePartecipateButton = ( data ) =>
+    getPartecipations = () =>
+    {
+        if ( UserManager.userData.partecipations === null && !UserManager.hasEventListener( "partecipationsReady", this.managePartecipateButton ) )
+            UserManager.addEventListener( "partecipationsReady", this.managePartecipateButton );
+        else if ( UserManager.userData.partecipations !== null )
+            this.managePartecipateButton();
+    }
+
+    partecipate = ( ) =>
+    {
+        if ( UserManager.userData.is_connected )
+            UserManager.sendPartecipation( this.props.match.params.id, this.getPartecipations );
+    }
+
+    leave = ( ) => 
+    {
+        if ( UserManager.userData.is_connected )
+            UserManager.removePartecipation( this.props.match.params.id, this.getPartecipations );
+    }
+
+    onPartecipateBtnClick = ( e ) => 
     {
         this.setState( {
-            user_partecipates: data.user_partecipates
+            partecipate_btn_enabled: false
         } );
+        UserManager.checkFacebookLogin( e !== null, this.partecipate );
     }
 
-    checkPartecipation = ( auth_response ) =>
+    onLeaveBtnClick = ( e ) => 
     {
-        console.log( "checkPartecipation", auth_response );
-        if ( auth_response )
-            ServerBridge.getUserPartecipates( auth_response.userID, this.props.match.params.id, this.managePartecipateButton );
-    }
-
-    partecipate = ( auth_response ) =>
-    {
-        if ( auth_response )
-            ServerBridge.setPartecipation( this.props.match.params.id, auth_response.userID, this.checkPartecipation );
-    }
-
-    leave = ( auth_response ) => 
-    {
-        if ( auth_response )
-            ServerBridge.removePartecipation( this.props.match.params.id, auth_response.userID, this.checkPartecipation );
+        this.setState( {
+            partecipate_btn_enabled: false
+        } );
+        UserManager.checkFacebookLogin( e !== null, this.leave );
     }
 
     componentDidMount()
     {
         ServerBridge.getRaidInfo( this.props.match.params.id, this.setInfo );
-
-        let check_count = 0,
-            fb_check = setInterval(() =>
-            {
-                if ( check_count++ > 100 )
-                {
-                    clearInterval( fb_check );
-                    return false;
-                }
-
-                if ( window.FB )
-                {
-                    this.checkFacebookLogin( this.checkPartecipation );
-                    clearInterval( fb_check );
-                }
-            }, 50 );
+        this.getPartecipations( );
     }
 
     render()
     {
         return (
             <div className="raid-info container">
-                <Alert
+                <PopUp
                     show={this.state.alert_show}
                     bsStyle={this.state.alert_style}
                     title={this.state.alert_title}
@@ -139,15 +130,17 @@ export default class RaidInfo extends Component
                     </Grid>
                     <div className="button-group">
                         {!this.state.user_partecipates && (
-                            <Button onClick={( e ) => { this.checkFacebookLogin( this.partecipate, e ); }} bsStyle="info">Partecipa al Raid</Button>
+                            <Button onClick={this.onPartecipateBtnClick} bsStyle="info" disabled={!this.state.partecipate_btn_enabled}>Partecipa al Raid</Button>
                         )
                         }
                         {this.state.user_partecipates && (
-                            <Button onClick={( e ) => { this.checkFacebookLogin( this.leave, e ); }} bsStyle="danger">Lascia il Raid</Button>
+                            <div>
+                                <Button onClick={this.onLeaveBtnClick} bsStyle="danger">Lascia il Raid</Button>
+                                <br />
+                                <ButtonGoToHistory goto={'/raid_chat/' + this.props.match.params.id} bsStyle="info">Raid Chat</ButtonGoToHistory>
+                            </div>
                         )
                         }
-                        <br />
-                        <ButtonGoToHistory goto={'/raid_chat/' + this.props.match.params.id} bsStyle="info">Raid Chat</ButtonGoToHistory>
                     </div>
                 </Panel>
             </div>

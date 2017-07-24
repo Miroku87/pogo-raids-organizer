@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Panel, Form, ControlLabel, Col, FormGroup, Button, FormControl, Checkbox } from "react-bootstrap";
-import Header from '../ui/Header';
-import Alert from '../ui/Alert';
+import PopUp from '../ui/PopUp';
 import ServerBridge from '../../utils/ServerBridge';
 import 'whatwg-fetch';
 
@@ -64,10 +63,10 @@ export default class RaidInsert extends Component
 
         this.state = {
             raid_already_started: false,
-            alert_show: false,
-            alert_title: "",
-            alert_message: "",
-            alert_html_message: "",
+            popup_show: false,
+            popup_title: "",
+            popup_message: "",
+            popup_html_message: "",
             raidLevel: 1,
             raidStartTime: "",
             raidCountdown: "",
@@ -97,9 +96,9 @@ export default class RaidInsert extends Component
 
         if ( target.max && target.min )
         {
-            if ( parseInt( value ) > target.max )
+            if ( parseInt( value, 10 ) > target.max )
                 value = target.max;
-            else if ( parseInt( value ) < target.min )
+            else if ( parseInt( value, 10 ) < target.min )
                 value = target.min;
         }
 
@@ -138,17 +137,17 @@ export default class RaidInsert extends Component
     showError = ( msg ) => 
     {
         let new_state = {
-            alert_show: true,
-            alert_title: "Errore",
-            alert_message: '',
-            alert_html_message: '',
-            alert_style: "modal-heading-danger"
+            popup_show: true,
+            popup_title: "Errore",
+            popup_message: '',
+            popup_html_message: '',
+            popup_style: "modal-heading-danger"
         };
 
         if ( typeof msg === "string" )
-            new_state.alert_html_message = msg;
+            new_state.popup_html_message = msg;
         else if ( typeof msg === "object" )
-            new_state.alert_message = msg;
+            new_state.popup_message = msg;
 
         this.setState( new_state);
     }
@@ -156,11 +155,11 @@ export default class RaidInsert extends Component
     hideAlert = () =>
     {
         this.setState( {
-            alert_show: false,
-            alert_title: "",
-            alert_message: '',
-            alert_html_message: '',
-            alert_style: ""
+            popup_show: false,
+            popup_title: "",
+            popup_message: '',
+            popup_html_message: '',
+            popup_style: ""
         } );
     }
     
@@ -168,12 +167,12 @@ export default class RaidInsert extends Component
     {
         return (
             <div className="container">
-                <Alert
-                    show={this.state.alert_show}
-                    bsStyle={this.state.alert_style}
-                    title={this.state.alert_title}
-                    message={this.state.alert_message}
-                    htmlMessage={this.state.alert_html_message}
+                <PopUp
+                    show={this.state.popup_show}
+                    bsStyle={this.state.popup_style}
+                    title={this.state.popup_title}
+                    message={this.state.popup_message}
+                    htmlMessage={this.state.popup_html_message}
                     onHide={this.hideAlert}
                 />
                 <Panel header="Inserisci le informazioni del Raid" bsStyle="success">

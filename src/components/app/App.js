@@ -8,6 +8,7 @@ import RaidChat from '../raid/RaidChat';
 import RaidInfo from '../raid/RaidInfo';
 import Help from './Help';
 import PositionWatcher from '../../utils/PositionWatcher';
+import UserManager from '../../utils/UserManager';
 
 import './App.css';
 
@@ -38,9 +39,14 @@ export default class App extends Component
         } );
     }
 
+    userLogged = () => 
+    {
+        console.log("logged");
+    }
+
     setupFacebookSDK = () =>
     {
-        window.fbAsyncInit = function ()
+        window.fbAsyncInit = () => 
         {
             window.FB.init( {
                 appId: '324218624671234',
@@ -49,6 +55,8 @@ export default class App extends Component
                 version: 'v2.8'
             } );
             window.FB.AppEvents.logPageView();
+
+            UserManager.checkFacebookLogin( false, this.userLogged );
         };
 
         ( function ( d, s, id )

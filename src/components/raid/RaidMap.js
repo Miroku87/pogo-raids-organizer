@@ -61,7 +61,7 @@ const Map = withGoogleMap( props => (
                     {marker.showInfo && (
                         <InfoWindow onCloseClick={onCloseClick}>
                             <div className="raid-info-win">
-                                <h4>{( new Array( parseInt( marker.level ) + 1 ).fill( 1 ) ).map(( e, i ) => { return ( <Glyphicon key={i} glyph="star" /> ); } )}</h4> 
+                                <h4>{( new Array( parseInt( marker.level, 10 ) + 1 ).fill( 1 ) ).map(( e, i ) => { return ( <Glyphicon key={i} glyph="star" /> ); } )}</h4> 
                                 ~ <Countdown countTo={new Date( count_to )} /><br /><br />
                                 <ButtonGoToHistory
                                     bsStyle="primary"
@@ -96,6 +96,8 @@ export default class RaidMap extends Component
 
     componentDidMount()
     {
+        ServerBridge.clearShowedRaidsSession();
+
         if ( !this.props.mapCenter )
             return false;
 
@@ -109,7 +111,9 @@ export default class RaidMap extends Component
 
     setMarkers = ( data ) => 
     {
-        let new_markers = [];
+        let new_markers = [],
+            old_markers = [],
+            bounds = this.getBounds( this._mapComponent );
 
         data.raids.forEach( ( r ) =>
         {
@@ -127,10 +131,14 @@ export default class RaidMap extends Component
             } );
         } );
 
-        new_markers = new_markers.filter( ( m ) => { return this.state.markers.indexOf( m ) === -1; } );
+
+        old_markers = this.state.markers.filter(( m ) =>
+        {
+            return m.position.lat > bounds[0] && m.position.lng > bounds[1] && m.position.lat < bounds[2] && m.position.lng < bounds[3];
+        } );
 
         this.setState( {
-            markers: new_markers
+            markers: new_markers.concat( old_markers )
         } );
     }
 
