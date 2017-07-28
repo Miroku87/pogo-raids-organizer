@@ -37,12 +37,6 @@ const Map = withGoogleMap( props => (
                 </div>
             </InfoWindow>
         )}
-        {props.markers.map( marker => (
-            <Marker
-                {...marker}
-            />
-        ) )}
-
         {props.markers.map(( marker, index ) =>
         {
             const

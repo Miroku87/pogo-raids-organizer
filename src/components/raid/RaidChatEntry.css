@@ -1,0 +1,36 @@
+.chat-entry {
+
+}
+/*
+    .chat-entry:nth-child(odd) {
+        background-color: #C8CAD4;
+    }
+
+    .chat-entry:nth-child(even) {
+        background-color: #E7E9F5;
+    }
+*/
+.chat-user-col {
+    text-align: left;
+}
+
+.user-picture {
+    height: 40px;
+}
+
+.chat-message-col {
+    text-align: right;
+}
+
+.chat-user-col + .chat-message-col {
+    text-align: left;
+}
+
+.chat-username {
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.chat-date {
+    font-size: 0.8em;
+}

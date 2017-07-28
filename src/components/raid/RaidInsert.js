@@ -131,7 +131,7 @@ export default class RaidInsert extends Component
             return false;
         }
 
-        ServerBridge.sendData( data, this.goToMap, this.showError );
+        ServerBridge.insertRaid( data, this.goToMap, this.showError );
     }
 
     showError = ( msg ) => 

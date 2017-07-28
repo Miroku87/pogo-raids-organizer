@@ -104,12 +104,12 @@ export default class ServerBridge
             } );
     }
 
-    static sendData = ( data, success, error ) =>
+    static insertRaid = ( data, success, error ) =>
     {
         data.action = "insert";
         data.what = "raidinfo";
         data.clientTime = Math.round( new Date().getTime() / 1000 );
-        
+
         fetch( RAID_SERVER_URL, {
             method: "POST",
             credentials: CREDENTIALS,
@@ -123,9 +123,9 @@ export default class ServerBridge
             {
                 return response.json();
             } )
-            .then( ( json ) =>
+            .then(( json ) =>
             {
                 ServerBridge.callback( json, success, error )
-            });
+            } );
     }
 }

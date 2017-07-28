@@ -1,3 +1,18 @@
 .alert {
     margin-top: 20px;
 }
+
+.raid-chat {
+    height: calc( 100% - 52px );
+}
+
+.raid-chat-body {
+    padding-top: 20px;
+    height: 100%;
+}
+
+    .raid-chat-body > .container {
+        height: calc( 100% - 49px );
+        width: 100% !important;
+        overflow-y: auto;
+    }
