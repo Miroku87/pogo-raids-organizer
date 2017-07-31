@@ -24,7 +24,7 @@ export default class FancyWebSocket extends EventEmitter
             this.conn = new window.WebSocket( ws_url );
 
         // dispatch to the right handlers
-        this.conn.onmessage = ( evt ) => { this.emit( 'message', JSON.parse( evt.data ) ) };
+        this.conn.onmessage = ( evt ) => { console.log(evt);this.emit( 'message', JSON.parse( evt.data ) ) };
         this.conn.onclose = () => { this.emit( 'close' ) };
         this.conn.onopen = () => { this.emit( 'open' ) };
     };

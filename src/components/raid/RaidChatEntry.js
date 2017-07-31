@@ -9,10 +9,13 @@ export default class RaidChatEntry extends Component
     render()
     {
         let real_entry = null,
-            entry_time = new Date( this.props.date ),
-            entry_time_str = entry_time.getHours() + ":" + entry_time.getMinutes() + ":" + entry_time.getSeconds();
+            entry_time = new Date(),
+            entry_time_str = "";
 
-        if ( this.props.username !== UserManager.userData.name )
+        entry_time.setTime( this.props.date );
+        entry_time_str = entry_time.toLocaleTimeString( 'it-IT' );
+
+        if ( this.props.userID !== UserManager.userData.user_id )
             real_entry = (
                 <Row className="show-grid chat-entry">
                     <Col sm={1} className="chat-user-col">

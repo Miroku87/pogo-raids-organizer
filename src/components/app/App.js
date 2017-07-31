@@ -41,7 +41,7 @@ export default class App extends Component
 
     userLogged = () => 
     {
-        console.log("logged");
+
     }
 
     setupFacebookSDK = () =>

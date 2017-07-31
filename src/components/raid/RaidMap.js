@@ -47,7 +47,7 @@ const Map = withGoogleMap( props => (
 
             return (
                 <Marker
-                    key={marker.key}
+                    key={index}
                     position={marker.position}
                     title={( index + 1 ).toString()}
                     onClick={onClick}

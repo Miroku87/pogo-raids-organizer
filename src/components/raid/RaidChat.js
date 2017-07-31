@@ -28,17 +28,17 @@ export default class RaidChat extends Component
 
     onSocketConnectioOpen = () =>
     {
-        this.addMessageToState( { username: "Sistema", user_picture_url: logo, message: "Connessione stabilita.", date: new Date().getTime() } );
+        this.socket_is_connected = true;
     }
 
     onSocketConnectionClose = () =>
     {
-        this.addMessageToState( { username: "Sistema", user_picture_url: logo, message: "Connessione persa.", date: new Date().getTime() } );
+        this.socket_is_connected = false;
+        this.addMessageToState( { username_chat: "Sistema", id_fb_user_chat: 0, picture_url_user_chat: logo, message_chat: "Connessione persa.", timestamp_chat: new Date().getTime() } );
     }
 
     onSocketMessage = ( data ) => 
     {
-        console.log(data);
         if ( data.type === "chatMessage" )
         {
             if ( data.data.username === "Sistema" )
@@ -50,13 +50,12 @@ export default class RaidChat extends Component
 
     sortChatMessagesByDate = ( a, b ) => 
     {
-        return a.date - b.date;
+        return a.timestamp_chat - b.timestamp_chat;
     }
 
     addMessageToState = ( message_obj ) =>
     {
-        let entries = [].concat( this.state.chat_entries );
-        entries.push( message_obj );
+        let entries = this.state.chat_entries.concat( message_obj );
         entries.sort( this.sortChatMessagesByDate );
 
         this.setState( {
@@ -72,12 +71,14 @@ export default class RaidChat extends Component
         } );
 
         if ( UserManager.userData.is_connected && UserManager.userPartecipatesTo( this.props.match.params.id ) )
+        {
             this.setSocket();
+            UserManager.getRaidChatEntries( this.props.match.params.id, this.addMessageToState );
+        }
     }
 
     setSocket = () =>
     {
-        console.log( "SET SOCKET" );
         this.socket = new FancyWebSocket( SOCKET_SERVER_HOST + ":" + SOCKET_SERVER_PORT );
         this.socket.addListener( "open", this.onSocketConnectioOpen );
         this.socket.addListener( "close", this.onSocketConnectionClose );
@@ -89,21 +90,22 @@ export default class RaidChat extends Component
         if ( text !== null && text !== "" && !/^\s+$/.test( text ) )
         {
             let message_obj = {
-                user_id: UserManager.userData.user_id,
-                username: UserManager.userData.name,
-                user_picture_url: UserManager.userData.picture_url,
-                message: text,
-                date: new Date().getTime()
+                raid_id_chat: this.props.match.params.id,
+                id_fb_user_chat: UserManager.userData.user_id,
+                username_chat: UserManager.userData.name,
+                picture_url_user_chat: UserManager.userData.picture_url,
+                message_chat: text,
+                timestamp_chat: new Date().getTime()
             };
 
             this.addMessageToState( message_obj );
             this.socket.send( "chatMessage", message_obj );
+            UserManager.saveRaidChatEntry( this.props.match.params.id, message_obj );
         }
     }
 
     componentDidMount = () => 
     {
-        console.log( "RaidChat, didmount" );
         if ( UserManager.userData.partecipations === null && !UserManager.hasEventListener( "partecipationsReady", this.managePartecipateButton ) )
             UserManager.addEventListener( "partecipationsReady", this.updateChatGrants );
         else if ( UserManager.userData.partecipations !== null )
@@ -128,10 +130,11 @@ export default class RaidChat extends Component
                                 return (
                                     <RaidChatEntry
                                         key={index}
-                                        username={entry.username}
-                                        userPictureUrl={entry.user_picture_url}
-                                        message={entry.message}
-                                        date={entry.date}
+                                        userID={entry.id_fb_user_chat}
+                                        username={entry.username_chat}
+                                        userPictureUrl={entry.picture_url_user_chat}
+                                        message={entry.message_chat}
+                                        date={entry.timestamp_chat}
                                     /> );
                             } )
                             }

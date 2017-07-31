@@ -1,13 +1,17 @@
 import ServerBridge from "./ServerBridge";
 
+const RAID_CHAT_MAX_SAVE = 20;
+
 let _data = {
         is_connected: false,
         user_id: 0,
+        lang: 'it',
         friends: [],
         picture_url: '',
         name: '',
         short_name: '',
-        partecipations: null
+        partecipations: null,
+        raid_chats: {}
     },
     _eventHandlers = {
         userConnection: [],
@@ -53,7 +57,7 @@ export default class UserManager
 
     static sendPartecipation = ( raid_id, success, error ) =>
     {
-        ServerBridge.sendPartecipation( raid_id, _data.user_id, () =>
+        ServerBridge.sendPartecipation( raid_id, _data.user_id, _data.picture_url, _data.name, () =>
         {
             _data.partecipations.push( raid_id ); //in alternativa o ulteriormente, controllare il DB
             if ( typeof success === "function" ) success();
@@ -74,6 +78,28 @@ export default class UserManager
     static userPartecipatesTo = ( raid_id ) =>
     {
         return _data.partecipations.indexOf( raid_id ) !== -1;
+    }
+
+    static saveRaidChatEntry = ( raid_id, message ) =>
+    {
+        _data.raid_chats[raid_id + ""].push( message );
+
+        if ( _data.raid_chats.length > RAID_CHAT_MAX_SAVE )
+            _data.raid_chats.splice( 0, 1 );
+    }
+
+    static getRaidChatEntries = ( raid_id, success, error ) =>
+    {
+        if ( typeof _data.raid_chats[raid_id + ""] === "undefined" && typeof success === "function" )
+        {
+            ServerBridge.getRaidChatEntries( raid_id, RAID_CHAT_MAX_SAVE, json =>
+            {
+                _data.raid_chats[raid_id + ""] = json.entries.concat();
+                success( json.entries );
+            }, error );
+        }
+        else if ( typeof _data.raid_chats[raid_id + ""] !== "undefined" && typeof success === "function" )
+            success( _data.raid_chats[raid_id + ""] );
     }
 
     static checkFacebookLogin = ( force_login, success, error ) =>

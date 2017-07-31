@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Panel, Form, ControlLabel, Col, FormGroup, Button, FormControl, Checkbox } from "react-bootstrap";
 import PopUp from '../ui/PopUp';
 import ServerBridge from '../../utils/ServerBridge';
+import TextsManager from '../../utils/TextsManager';
+import UserManager from '../../utils/UserManager';
 import 'whatwg-fetch';
 
 import "./RaidInsert.css";
@@ -115,19 +117,21 @@ export default class RaidInsert extends Component
 
     sendRaidData = () =>
     {
-        let { raid_already_started, ...data } = this.state;
+        let { raid_already_started,  popup_show, popup_title, popup_message, popup_html_message, popup_style, ...data } = this.state;
         data.lat = this.props.match.params.lat;
         data.lon = this.props.match.params.lng;
 
         if ( data.raidStartTime === "" && data.raidCountdown === "" )
         {
-            this.showError( <span>Almeno un campo tra <code>Orario di Inizio</code> e <code>Minuti Rimanenti</code> deve essere compilato.</span> );
+            let error_str = TextsManager.getText( UserManager.userData.lang, "errors", "startTimeOrCountdownMissing" );
+            this.showError( error_str );
             return false;
         }
 
         if ( data.raidStartTime === "" && data.raidCountdown !== "" && data.raidPokemon === "" )
         {
-            this.showError( <span>Se il raid &egrave; gi&agrave; iniziato inserire il nome del Pok&eacute;mon.</span> );
+            let error_str = TextsManager.getText( UserManager.userData.lang, "errors", "missingPokeName" );
+            this.showError( error_str );
             return false;
         }
 
@@ -138,13 +142,15 @@ export default class RaidInsert extends Component
     {
         let new_state = {
             popup_show: true,
-            popup_title: "Errore",
+            popup_title: TextsManager.getText( UserManager.userData.lang, "labels", "errorTitle" ),
             popup_message: '',
             popup_html_message: '',
             popup_style: "modal-heading-danger"
         };
 
-        if ( typeof msg === "string" )
+        if ( typeof msg === "string" && msg.indexOf( "@@" ) === 0 )
+            new_state.popup_html_message = TextsManager.getText( UserManager.userData.lang, "errors", msg.substr( 2 ) );
+        else if ( typeof msg === "string" && msg.indexOf( "@@" ) === -1 )
             new_state.popup_html_message = msg;
         else if ( typeof msg === "object" )
             new_state.popup_message = msg;

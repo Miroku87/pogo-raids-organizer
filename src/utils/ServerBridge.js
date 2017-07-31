@@ -17,7 +17,7 @@ export default class ServerBridge
     static getRaids = ( coords_info, success, error ) =>
     {
         let coords = coords_info.join( "," );
-
+        //TODO: get number of partecipants
         fetch( RAID_SERVER_URL + "?action=get&what=nearestraids&coords=" + coords, {
             method: "GET",
             credentials: CREDENTIALS
@@ -48,6 +48,38 @@ export default class ServerBridge
             } );
     }
 
+    static getRaidPartecipations = ( raid_id, success, error ) =>
+    {
+        fetch( RAID_SERVER_URL + "?action=get&what=raidpartecipations&raid_id=" + raid_id, {
+            method: "GET",
+            credentials: CREDENTIALS
+        } )
+            .then( function ( response )
+            {
+                return response.json();
+            } )
+            .then(( json ) =>
+            {
+                ServerBridge.callback( json, success, error )
+            } );
+    }
+
+    static getRaidChatEntries = ( raid_id, limit, success, error ) =>
+    {
+        fetch( RAID_SERVER_URL + "?action=get&what=raidchatentries&raid_id=" + raid_id + "&limit=" + limit, {
+            method: "GET",
+            credentials: CREDENTIALS
+        } )
+            .then( function ( response )
+            {
+                return response.json();
+            } )
+            .then(( json ) =>
+            {
+                ServerBridge.callback( json, success, error )
+            } );
+    }
+
     static clearShowedRaidsSession = () =>
     {
         fetch( RAID_SERVER_URL + "?action=do&what=clearraidssession", {
@@ -56,11 +88,25 @@ export default class ServerBridge
         } );
     }
 
-    static sendPartecipation = ( raid_id, user_id, success, error ) =>
+    static sendPartecipation = ( raid_id, user_id, user_picture_url, user_name, success, error ) =>
     {
-        fetch( RAID_SERVER_URL + "?action=insert&what=raidpartecipation&raid_id=" + raid_id + "&user_id=" + user_id, {
-            method: "GET",
-            credentials: CREDENTIALS
+        let body = {
+            action: "insert",
+            what: "raidpartecipation",
+            raid_id: raid_id,
+            user_id: user_id,
+            user_picture_url: user_picture_url,
+            user_name: user_name
+        };
+
+        fetch( RAID_SERVER_URL , {
+            method: "POST",
+            credentials: CREDENTIALS,
+            headers: {
+                'Accept': 'application/json, application/xml, text/plain, text/html, *.*',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: "json=" + encodeURIComponent( JSON.stringify( body ) )
         } )
             .then( function ( response )
             {

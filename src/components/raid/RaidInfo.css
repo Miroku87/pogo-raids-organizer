@@ -10,3 +10,9 @@
         min-width: 140px;
         margin-top: 20px;
     }
+
+.attendee-picture
+{
+    width: 50px;
+    margin-right: 5px;
+}
